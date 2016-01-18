@@ -1,0 +1,17 @@
+﻿{
+
+  "dependencies": {
+    "Genus.AspNet.Modularity": "1.0.0.0",
+    "xunit": "2.2.0-beta1-build3239",
+    "xunit.runner.aspnet": "2.0.0-aspnet-rc2-16023",
+    "Moq": "4.2.1510.2205",
+    "Microsoft.Extensions.DependencyInjection": "1.0.0-rc2-15921"
+  },
+
+  "frameworks": {
+    "dnx451": { }
+  },
+  "commands": {
+    "test": "xunit.runner.aspnet"
+  }
+}
