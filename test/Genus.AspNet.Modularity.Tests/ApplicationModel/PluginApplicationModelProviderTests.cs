@@ -1,4 +1,5 @@
 ﻿using Genus.AspNet.Modularity.ApplicationModel;
+using Genus.AspNet.Modularity.Tests.Stubs;
 using Microsoft.AspNet.Mvc.ApplicationModels;
 using Moq;
 using System;
@@ -31,7 +32,8 @@ namespace Genus.AspNet.Modularity.Tests
             var typeInfo1 = typeof(PluginInfo).GetTypeInfo();
             var typeInfo2 = typeof(PluginManager).GetTypeInfo();
             var pluginManagerMock = new Mock<IPluginManager>();
-            pluginManagerMock.Setup(pm => pm[It.Is<TypeInfo>(ti=>ti==typeInfo1)]).Returns(new PluginInfo(pluginName, null, null));
+            pluginManagerMock.Setup(pm => pm[It.Is<TypeInfo>(ti=>ti==typeInfo1)])
+                .Returns(new PluginInfo(new ModuleStub { UrlPrefix = pluginName }, null, null, null));
             var target = new PluginApplicationModelProvider(pluginManagerMock.Object);
             var context = new ApplicationModelProviderContext(new[] { typeInfo1, typeInfo2 });
             context.Result.Controllers.Add( new ControllerModel(typeInfo1, new object[0]));

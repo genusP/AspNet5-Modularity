@@ -1,22 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Genus.AspNet.Modularity
 {
     public sealed class PluginInfo
     {
-        internal PluginInfo(string name, string description, string pluginRoot)
+        internal PluginInfo(IPlugin plugin, string description, string pluginRoot, Assembly assembly)
         {
-            Name = name;
+            Plugin = plugin;
             Description = description;
             PluginRoot = pluginRoot;
+            Assembly = assembly;
         }
-        public string Name { get; private set; }
+        public string Name { get { return Plugin.Name; } }
 
-        public string Description { get; private set; }
+        public IPlugin Plugin { get; }
 
-        public string PluginRoot { get; private set; }
+        public string Description { get;}
+
+        public string PluginRoot { get;}
+
+        public Assembly Assembly { get; }
     }
 }

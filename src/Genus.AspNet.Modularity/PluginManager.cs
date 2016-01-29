@@ -12,7 +12,7 @@ namespace Genus.AspNet.Modularity
     public sealed class PluginManager : IPluginManager
     {
         private readonly IPluginLoader _loader;
-        private IList<Tuple<Assembly, PluginInfo, IPlugin>> plugins;
+        private IList<PluginInfo> pluginInfoList;
 
         public PluginManager(IPluginLoader loader)
         {
@@ -25,9 +25,9 @@ namespace Genus.AspNet.Modularity
         {
             get
             {
-                if (plugins == null)
+                if (pluginInfoList == null)
                     return Enumerable.Empty<PluginInfo>();
-                return plugins.Select(p => p.Item2);
+                return pluginInfoList.Select(p => p);
             }
         }
 
@@ -35,21 +35,27 @@ namespace Genus.AspNet.Modularity
         {
             get
             {
-                return plugins.SingleOrDefault(t => t.Item1 == type.Assembly)?.Item2;
+                return pluginInfoList.SingleOrDefault(t => t.Assembly == type.Assembly);
             }
         }
 
         public void ConfigureServices(IServiceCollection serviceCollection)
         {
-            if (this.plugins != null)
+            if (this.pluginInfoList != null)
                 throw new InvalidOperationException("Alredy inizialized");
-            plugins = new List<Tuple<Assembly, PluginInfo, IPlugin>>();
+            pluginInfoList = new List<PluginInfo>();
             foreach (var item in _loader.LoadPlugins())
             {
-                var pi = new PluginInfo(item.Name, null, GetPluginRoot(item));
-                plugins.Add(new Tuple<Assembly, PluginInfo, IPlugin>(item.GetType().GetTypeInfo().Assembly, pi, item));
+                var pluginTypeInfo = item.GetType().GetTypeInfo();
+                var pi = new PluginInfo(item, GetPluginDescription(item), GetPluginRoot(item), pluginTypeInfo.Assembly);
+                pluginInfoList.Add(pi);
                 item.ConfigureServices(serviceCollection);
             }
+        }
+
+        private string GetPluginDescription(IPlugin plugin)
+        {
+            return (plugin as IPluginWithDescription)?.Description;
         }
 
         private string GetPluginRoot(IPlugin item)
@@ -68,11 +74,11 @@ namespace Genus.AspNet.Modularity
         {
             if (applicationBuilder == null)
                 throw new ArgumentNullException(nameof(applicationBuilder));
-            if (plugins == null)
+            if (pluginInfoList == null)
                 throw new InvalidOperationException("Call ConfigureServices before");
-            foreach (var plugin in plugins)
+            foreach (var pluginInfo in pluginInfoList)
             {
-                plugin.Item3.Configure(applicationBuilder);
+                pluginInfo.Plugin.Configure(applicationBuilder);
             }
         }
     }

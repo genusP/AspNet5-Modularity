@@ -11,7 +11,9 @@ namespace Genus.AspNet.Modularity
     public interface IPlugin
     {
         string Name { get; }
-        //string Url { get; }
+
+        string UrlPrefix { get; }
+
         void ConfigureServices(IServiceCollection serviceCollection);
 
         void Configure(IApplicationBuilder appBuilder);

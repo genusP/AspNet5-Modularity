@@ -1,4 +1,5 @@
-﻿using Genus.AspNet.Modularity.ViewFutures;
+﻿using Genus.AspNet.Modularity.Tests.Stubs;
+using Genus.AspNet.Modularity.ViewFutures;
 using Microsoft.AspNet.Http.Internal;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Abstractions;
@@ -31,7 +32,9 @@ namespace Genus.AspNet.Modularity.Tests.ViewFutures
                     },
                     new string[] { //expected
                         "/testPlug/Views/{1}/{0}.cshtml",
+                        "/Views/testPlug/{1}/{0}.cshtml",
                         "/testPlug/Views/Shared/{0}.cshtml",
+                        "/Views/testPlug/Shared/{0}.cshtml",
                         "/Views/{1}/{0}.cshtml",
                         "/Views/Shared/{0}.cshtml"
                     }
@@ -44,7 +47,9 @@ namespace Genus.AspNet.Modularity.Tests.ViewFutures
                     },
                     new string[] { //expected
                         "/PluginForTest/Views/{1}/{0}.cshtml",
+                        "/Views/PluginForTest/{1}/{0}.cshtml",
                         "/PluginForTest/Views/Shared/{0}.cshtml",
+                        "/Views/PluginForTest/Shared/{0}.cshtml",
                         "/Views/{1}/{0}.cshtml",
                         "/Views/Shared/{0}.cshtml"
                     }
@@ -73,7 +78,8 @@ namespace Genus.AspNet.Modularity.Tests.ViewFutures
         {
             var pluginManagerMock = new Mock<IPluginManager>();
             if(exists)
-                pluginManagerMock.Setup(pm => pm[It.IsAny<TypeInfo>()]).Returns(new PluginInfo(pluginName, null, null));
+                pluginManagerMock.Setup(pm => pm[It.IsAny<TypeInfo>()])
+                    .Returns(new PluginInfo(new ModuleStub { UrlPrefix = pluginName }, null, null, null));;
 
             var services = new ServiceCollection();
             services.Add(new ServiceDescriptor(typeof(IPluginManager), pluginManagerMock.Object));

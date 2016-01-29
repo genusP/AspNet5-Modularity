@@ -30,7 +30,7 @@ namespace Genus.AspNet.Modularity.ApplicationModel
             {
                 var pluginInfo = _pluginManager[item.ControllerType];
                 if (pluginInfo != null)
-                    item.RouteConstraints.Add(new PluginRouteConstraintProvider(pluginInfo.Name));
+                    item.RouteConstraints.Add(new PluginRouteConstraintProvider(pluginInfo.Plugin.UrlPrefix));
             }   
         }
 

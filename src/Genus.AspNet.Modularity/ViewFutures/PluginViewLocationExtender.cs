@@ -17,8 +17,11 @@ namespace Genus.AspNet.Modularity.ViewFutures
             var pluginInfo = pluginManager[actionDescriptor.ControllerTypeInfo];
             if (pluginInfo!=null)
             {
-                yield return "/" + pluginInfo.Name + "/Views/{1}/{0}.cshtml";
-                yield return "/" + pluginInfo.Name + "/Views/Shared/{0}.cshtml";
+                var prefix = pluginInfo.Plugin.UrlPrefix;
+                yield return "/" + prefix + "/Views/{1}/{0}.cshtml";
+                yield return "/Views/" + prefix + "/{1}/{0}.cshtml";
+                yield return "/" + prefix + "/Views/Shared/{0}.cshtml";
+                yield return "/Views/" + prefix + "/Shared/{0}.cshtml";
             }
             foreach(var viewLocation in viewLocations)
                 yield return viewLocation;

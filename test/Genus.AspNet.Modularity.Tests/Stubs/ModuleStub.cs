@@ -27,6 +27,12 @@ namespace Genus.AspNet.Modularity.Tests.Stubs
 
         public bool ConfigureCalled { get; private set; } = false;
 
+        public string UrlPrefix
+        {
+            get;
+            set;
+        }
+
         public void Configure(IApplicationBuilder appBuilder)
         {
             ConfigureCalled = true;
