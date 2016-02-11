@@ -115,7 +115,7 @@ namespace Genus.AspNet.Modularity.ViewFutures
             if (!string.IsNullOrEmpty(subfolder))
                 path = System.IO.Path.Combine(path, subfolder);
             _fileProvider = new PhysicalFileProvider(path);
-            _pathPrefix = "/"+plugin.Name+"/";
+            _pathPrefix = "/"+plugin.Plugin.UrlPrefix+"/";
         }
 
         public IDirectoryContents GetDirectoryContents(string subpath)
