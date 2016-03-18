@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D157500F-2AFD-4C49-91E4-DD0DEB10F750}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{272F86AB-8A7E-4E0C-84F4-FB9ECC312511}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Genus.AspNetCore.Modularity", "src\Genus.AspNetCore.Modularity\Genus.AspNetCore.Modularity.xproj", "{C8F24CB6-6DC5-46C6-B34D-C59033E128F3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4D87698B-4FB3-46F2-9157-2BA1838349A5}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Genus.AspNetCore.Modularity.Tests", "test\Genus.AspNetCore.Modularity.Tests\Genus.AspNetCore.Modularity.Tests.xproj", "{078E33F5-7A18-4460-AA9F-5D9BDC429182}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8F24CB6-6DC5-46C6-B34D-C59033E128F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8F24CB6-6DC5-46C6-B34D-C59033E128F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8F24CB6-6DC5-46C6-B34D-C59033E128F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8F24CB6-6DC5-46C6-B34D-C59033E128F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{078E33F5-7A18-4460-AA9F-5D9BDC429182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{078E33F5-7A18-4460-AA9F-5D9BDC429182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{078E33F5-7A18-4460-AA9F-5D9BDC429182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{078E33F5-7A18-4460-AA9F-5D9BDC429182}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C8F24CB6-6DC5-46C6-B34D-C59033E128F3} = {D157500F-2AFD-4C49-91E4-DD0DEB10F750}
+		{078E33F5-7A18-4460-AA9F-5D9BDC429182} = {4D87698B-4FB3-46F2-9157-2BA1838349A5}
+	EndGlobalSection
+EndGlobal
