@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.0.1-rc2-20101",
+  "version": "1.0.1-rc2-20102",
   "description": "Genus.AspNetCore.Modularity Class Library",
   "authors": [ "genus" ],
   "tags": [ "" ],
@@ -8,13 +8,17 @@
 
   "dependencies": {
     "Microsoft.NETCore.Platforms": "1.0.1-rc2-*",
-    "Microsoft.AspNetCore.Mvc.Dnx": "1.0.0-rc2-20100",
-    "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-20100",
-    "Microsoft.Extensions.FileProviders.Physical": "1.0.0-rc2-20100",
-    "Microsoft.Extensions.Configuration.Binder": "1.0.0-rc2-20100"
+    "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-20254",
+    "Microsoft.AspNetCore.Mvc.Dnx": "1.0.0-rc2-20254",
+    "Microsoft.Extensions.FileProviders.Physical": "1.0.0-rc2-20254",
+    "Microsoft.Extensions.Configuration.Binder": "1.0.0-rc2-20254"
   },
 
   "frameworks": {
-    "net451": { }
+    "net451": {
+      "frameworkAssemblies": {
+        "System.ComponentModel": "4.0.0.0" 
+      }
+    }
   }
 }

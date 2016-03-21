@@ -2,6 +2,7 @@
 using Genus.AspNetCore.Modularity.ApplicationModel;
 using Genus.AspNetCore.Modularity.ViewFutures;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,10 +26,8 @@ namespace Genus.Extensions.DependencyInjection
             return pluginManager;
         }
 
-        public static IPluginManager AddPluginsFromConfig(this IServiceCollection services, IConfiguration configuration, ILogger logger)
+        public static IPluginManager AddPluginsFromDependencies(this IServiceCollection services, ILogger logger)
         {
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
 

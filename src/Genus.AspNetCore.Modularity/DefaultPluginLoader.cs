@@ -17,7 +17,7 @@ namespace Genus.AspNetCore.Modularity
 
         public DefaultPluginLoader(ILogger logger)
         {
-            if (logger==null)
+            if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
             _logger = logger;
         }
@@ -25,9 +25,11 @@ namespace Genus.AspNetCore.Modularity
         public IEnumerable<IPlugin> LoadPlugins() {
 
             _logger.LogInformation("Begin load plugins");
-            foreach (var library in DnxPlatformServices.Default.LibraryManager.GetLibraries())
+            var lm = DnxPlatformServices.Default.LibraryManager;
+            foreach (var depend in lm.GetLibrary(PlatformServices.Default.Application.ApplicationName).Dependencies)
             {
-                _logger.LogInformation($"Load plugins from {library.Name}");
+                _logger.LogInformation($"Load plugins from {depend}");
+                var library = lm.GetLibrary(depend);
                 foreach (var plugin in GetPluginsFromLibrary(library))
                 {
                     yield return plugin;
@@ -41,7 +43,8 @@ namespace Genus.AspNetCore.Modularity
             foreach (var assemblyName in library.Assemblies)
             {
                 TypeInfo item;
-                try {
+                try
+                {
                     var assembly = Assembly.Load(assemblyName);
                     item = assembly.DefinedTypes.FirstOrDefault(t => typeof(IPlugin).IsAssignableFrom(t) && !t.IsAbstract && !t.IsGenericType);
                 }

@@ -23,7 +23,7 @@ namespace Genus.AspNetCore.Modularity.ViewFutures
         {
             foreach (var pluginInfo in pluginManager.LoadedPlugins)
             {
-                yield return new PluginFileProvider(pluginInfo, subfolder, pluginInfo.Plugin.UrlPrefix);
+                yield return new PluginFileProvider(pluginInfo, subfolder, null);
             }
         }
 
