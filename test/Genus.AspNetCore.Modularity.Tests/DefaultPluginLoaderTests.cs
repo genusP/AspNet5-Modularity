@@ -24,22 +24,18 @@ namespace Genus.AspNetCore.Modularity.Tests
             var optionsMock = new Mock<IOptions<PluginsOption>>();
 
             //act
-            Action act = () => new DefaultPluginLoader(null, new Mock<ILogger>().Object);
-            Action act2 = () => new DefaultPluginLoader(new Mock<IAssemblyProvider>().Object, null);
+            Action act = () => new DefaultPluginLoader(new Mock<ILogger>().Object);
 
             //assert
-            Assert.Throws<ArgumentNullException>("provider", act);
-            Assert.Throws<ArgumentNullException>("logger", act2);
+            Assert.Throws<ArgumentNullException>("logger", act);
         }
 
         [Fact]
         public void LoadModules()
         {
             var optionsMock = new Mock<IOptions<PluginsOption>>();
-            var provider = new Mock<IAssemblyProvider>();
-            provider.Setup(p => p.CandidateAssemblies).Returns(new[] { GetType().Assembly });
 
-            var target = new DefaultPluginLoader(provider.Object, logger);
+            var target = new DefaultPluginLoader(logger);
 
             var result = target.LoadPlugins();
 
