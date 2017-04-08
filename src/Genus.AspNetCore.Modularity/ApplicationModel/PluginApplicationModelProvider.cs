@@ -1,4 +1,4 @@
-﻿using Genus.AspNetCore.Modularity;
+﻿using Genus.Modularity;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System;
 using System.Collections.Generic;
@@ -12,25 +12,17 @@ namespace Genus.AspNetCore.Modularity.ApplicationModel
         readonly IPluginManager _pluginManager;
         public PluginApplicationModelProvider(IPluginManager pluginManager)
         {
-            if(pluginManager==null)
-                throw new ArgumentNullException(nameof(pluginManager));
-            _pluginManager = pluginManager;
+            _pluginManager = pluginManager ?? throw new ArgumentNullException(nameof(pluginManager));
         }
-        public int Order
-        {
-            get
-            {
-                return int.MaxValue;
-            }
-        }
+        public int Order => int.MaxValue;
 
         public void OnProvidersExecuted(ApplicationModelProviderContext context)
         {
             foreach (var item in context.Result.Controllers)
             {
                 var pluginInfo = _pluginManager[item.ControllerType];
-                if (pluginInfo != null)
-                    item.RouteConstraints.Add(new PluginRouteConstraintProvider(pluginInfo.Plugin.UrlPrefix));
+                if (pluginInfo != null && pluginInfo.Plugin is IAspNetCorePlugin plugin)
+                    item.RouteValues.Add("plugin",plugin.UrlPrefix);
             }   
         }
 

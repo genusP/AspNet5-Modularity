@@ -4,11 +4,11 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Genus.AspNetCore.Modularity
+namespace Genus.Modularity
 {
-    public sealed class PluginInfo
+    public sealed class PluginDescriptor
     {
-        internal PluginInfo(IPlugin plugin, string description, string pluginRoot, Assembly assembly)
+        internal PluginDescriptor(IPlugin plugin, string description, string pluginRoot, Assembly assembly)
         {
             Plugin = plugin;
             Description = description;

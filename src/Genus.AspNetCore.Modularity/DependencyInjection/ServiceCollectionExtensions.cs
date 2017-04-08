@@ -1,6 +1,7 @@
 ﻿using Genus.AspNetCore.Modularity;
 using Genus.AspNetCore.Modularity.ApplicationModel;
 using Genus.AspNetCore.Modularity.ViewFutures;
+using Genus.Modularity;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -16,35 +17,20 @@ namespace Genus.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IPluginManager AddPlugins(this IServiceCollection services, IPluginLoader loader)
+        public static void AddPlugins(this IServiceCollection services, IPluginManager pluginManager)
         {
-            var pluginManager = new PluginManager(loader);
-            pluginManager.ConfigureServices(services);
-            services.Add(new ServiceDescriptor(typeof(IPluginManager), pluginManager));
             services.AddPluginApplicationModel();
             services.AddPluginViewLocations(pluginManager);
-            return pluginManager;
         }
 
-        public static IPluginManager AddPluginsFromDependencies(this IServiceCollection services, ILogger logger)
-        {
-            if (logger == null)
-                throw new ArgumentNullException(nameof(logger));
-
-            return services.AddPlugins(
-                new DefaultPluginLoader(logger));
-        }
-
-        private static void AddPluginApplicationModel(this IServiceCollection services)
+        public static void AddPluginApplicationModel(this IServiceCollection services)
         {
             services.AddTransient<IApplicationModelProvider, PluginApplicationModelProvider>();
         }
 
         private static void AddPluginViewLocations(this IServiceCollection services, IPluginManager pluginManager)
         {
-            services.Configure<RazorViewEngineOptions>(o => {
-                o.ConfigurePluginsView(pluginManager);
-            });
+            services.Configure<RazorViewEngineOptions>(o => o.ConfigurePluginsView(pluginManager));
         }
 
         public static RazorViewEngineOptions ConfigurePluginsView( this RazorViewEngineOptions options, IPluginManager pluginManager)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Genus.Modularity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,12 +16,10 @@ namespace Genus.AspNetCore.Modularity.ViewFutures
             var actionDescriptor = (ControllerActionDescriptor)context.ActionContext.ActionDescriptor;
             var pluginManager = context.ActionContext.HttpContext.RequestServices.GetRequiredService<IPluginManager>();
             var pluginInfo = pluginManager[actionDescriptor.ControllerTypeInfo];
-            if (pluginInfo!=null)
+            if (pluginInfo!=null && pluginInfo.Plugin is IAspNetCorePlugin plugin)
             {
-                var prefix = pluginInfo.Plugin.UrlPrefix;
-                //yield return "/" + prefix + "/Views/{1}/{0}.cshtml";
+                var prefix = plugin.UrlPrefix;
                 yield return "/Views/" + prefix + "/{1}/{0}.cshtml";
-                //yield return "/" + prefix + "/Views/Shared/{0}.cshtml";
                 yield return "/Views/" + prefix + "/Shared/{0}.cshtml";
             }
             foreach(var viewLocation in viewLocations)

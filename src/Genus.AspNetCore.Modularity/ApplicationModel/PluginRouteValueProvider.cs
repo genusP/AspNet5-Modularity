@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Genus.AspNetCore.Modularity.ApplicationModel
 {
-    public class PluginRouteConstraintProvider : IRouteConstraintProvider
+    public class PluginRouteValueProvider : IRouteValueProvider
     {
-        public PluginRouteConstraintProvider(string name)
+        public PluginRouteValueProvider(string name)
         {
             RouteValue = name;
             RouteKey = "plugin";
@@ -22,11 +22,6 @@ namespace Genus.AspNetCore.Modularity.ApplicationModel
         }
 
         public string RouteKey
-        {
-            get;
-        }
-
-        public RouteKeyHandling RouteKeyHandling
         {
             get;
         }

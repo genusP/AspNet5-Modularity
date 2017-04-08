@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 
-namespace Genus.AspNetCore.Modularity.Tests.Stubs
+namespace Genus.Modularity.Tests.Stubs
 {
-    class ModuleStub : IPlugin
+    public class ModuleStub : IPlugin
     {
         public string Name
         {
@@ -22,20 +21,6 @@ namespace Genus.AspNetCore.Modularity.Tests.Stubs
         public void ConfigureServices(IServiceCollection serviceCollection)
         {
             ConfigureServicesCalled = true;
-        }
-
-
-        public bool ConfigureCalled { get; private set; } = false;
-
-        public string UrlPrefix
-        {
-            get;
-            set;
-        }
-
-        public void Configure(IApplicationBuilder appBuilder)
-        {
-            ConfigureCalled = true;
         }
     }
 }

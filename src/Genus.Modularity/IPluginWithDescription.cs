@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Genus.AspNetCore.Modularity
+namespace Genus.Modularity
 {
     public interface IPluginWithDescription
     {

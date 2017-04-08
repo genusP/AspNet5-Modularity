@@ -5,14 +5,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Genus.AspNetCore.Modularity.Tests")]
-[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Genus.AspNetCore.Modularity.Tests")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyProduct("Genus.Modularity")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -20,4 +16,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("078e33f5-7a18-4460-aa9f-5d9bdc429182")]
+[assembly: Guid("04c40dc7-2742-4a6c-86b0-54b35eccfd4a")]
+
+[assembly:InternalsVisibleTo("Genus.Modularity.Tests")]
+[assembly:InternalsVisibleTo("Genus.AspNetCore.Modularity.Tests")]
