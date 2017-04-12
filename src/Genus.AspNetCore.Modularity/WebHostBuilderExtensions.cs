@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using Genus.Modularity;
 using Microsoft.AspNetCore.Hosting;
@@ -12,8 +11,15 @@ namespace Genus.AspNetCore.Modularity
 {
     public static class WebHostBuilderExtensions
     {
-        public static IWebHostBuilder UsePluginManager<T>(this IWebHostBuilder hostBuilder, Func<IServiceProvider,IPluginProvider> pluginProviderFactory)
-            where T:IPlugin
+        public static IWebHostBuilder UsePluginManager(this IWebHostBuilder hostBuilder, Func<IServiceProvider, IPluginProvider> pluginProviderFactory)
+            => hostBuilder.UsePluginManager<AssemblyPluginLoader<IPlugin>>(pluginProviderFactory);
+
+        public static IWebHostBuilder UsePluginManager<TLoader>(this IWebHostBuilder hostBuilder, Func<IServiceProvider, IPluginProvider> pluginProviderFactory)
+            where TLoader : IPluginLoader, new()
+            => hostBuilder.UsePluginManager( sp => new PluginManager(pluginProviderFactory(sp), new TLoader(), sp.GetRequiredService<ILogger<PluginManager>>()));
+
+        public static IWebHostBuilder UsePluginManager(this IWebHostBuilder hostBuilder, Func<IServiceProvider,PluginManager> pluginManagerFactory, 
+                                                            IConfiguration configuration = null)
         {
             var startupAssemblyName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
 
@@ -22,21 +28,18 @@ namespace Genus.AspNetCore.Modularity
                               {
                                   var startup = services.FirstOrDefault(_ => _.ServiceType == typeof(IStartup));
                                   if (startup ==null)
-                                      throw new InvalidOperationException("Call UseStartup befor this method");
+                                      throw new InvalidOperationException("Call UseStartup before this method");
 
                                   Func<IServiceProvider, IStartup> factory = sp =>
                                   {
                                       var baseStartup = startup.ImplementationInstance ?? startup.ImplementationFactory(sp);
-                                      return new StartupWrapper((IStartup)baseStartup, sp.GetRequiredService<PluginManager>());
+                                      return new StartupWrapper((IStartup)baseStartup, sp.GetRequiredService<PluginManager>(), configuration);
                                   };
 
                                   var serviceDescriptor = new ServiceDescriptor(startup.ServiceType, factory, ServiceLifetime.Singleton);
                                   services.Replace(serviceDescriptor);
 
-                                  services.AddSingleton(
-                                      sp => new PluginManager(pluginProviderFactory(sp), 
-                                      new AssemblyPluginLoader<T>(), 
-                                      sp.GetRequiredService<ILogger<PluginManager>>()));
+                                  services.AddSingleton(pluginManagerFactory);
                               });
         }
     }

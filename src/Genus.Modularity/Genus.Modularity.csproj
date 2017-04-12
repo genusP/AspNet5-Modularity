@@ -10,7 +10,10 @@
     <PackageProjectUrl>https://github.com/genusP/Genus.Modularity</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/genusP/Genus.Modularity/blob/master/LICENSE</PackageLicenseUrl>
     <Description />
-    <Version>1.0.0-alpha1</Version>
+    <Version>1.0.0-alpha2-1704021</Version>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>
+    <Authors>Pundikov Gennady</Authors>
   </PropertyGroup>
 
   <ItemGroup>

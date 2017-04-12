@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Genus.AspNetCore.Modularity Class Library</Description>
     <VersionPrefix>1.0.1-rc2-20254</VersionPrefix>
-    <Authors>genus</Authors>
+    <Authors>Pundikov Gennady</Authors>
     <TargetFrameworks>netstandard1.6;net451</TargetFrameworks>
     <RuntimeIdentifiers>win7-x64;win7-x86;osx.10.10-x64;osx.10.11-x64;ubuntu.14.04-x64;ubuntu.16.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64;fedora.23-x64;opensuse.13.2-x64</RuntimeIdentifiers>
     <AssemblyName>Genus.AspNetCore.Modularity</AssemblyName>
@@ -14,9 +14,10 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <Version>1.0.0-alpha1</Version>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>
+    <Version>1.0.0-alpha2-1704021</Version>
+    <PackageLicenseUrl>https://github.com/genusP/Genus.Modularity/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
 
   <ItemGroup>
