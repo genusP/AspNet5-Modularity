@@ -10,11 +10,18 @@ namespace Genus.Modularity
     public class AssemblyPluginLoader<T> : IPluginLoader
         where T:IPlugin
     {
-        public PluginDescriptor LoadPlugin(CandidateDescriptor candidate)
+
+        public virtual PluginDescriptor LoadPlugin(CandidateDescriptor candidate, Action<Assembly> onAssemblyLoad = null)
         {
             var assemblyPath = Path.GetFullPath(candidate.AssemblyPath);
             var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
-            var assembly = Assembly.Load(new AssemblyName(assemblyName));
+            Assembly assembly = null;
+            //try get already loaded assembly
+            try
+            {
+                assembly = Assembly.Load(new AssemblyName(assemblyName));
+            }
+            catch (FileNotFoundException) { } //catch exception if assembly not loaded
             if (assembly == null)
             {
 #if NET451
@@ -23,6 +30,11 @@ namespace Genus.Modularity
                 assembly = System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
 #endif
             }
+
+            if (onAssemblyLoad != null)
+#pragma warning disable IDE1005 // Delegate invocation can be simplified.
+                onAssemblyLoad(assembly);
+#pragma warning restore IDE1005 // Delegate invocation can be simplified.
 
             var plugin = GetPluginFromAssembly(assembly);
             if (plugin != null)

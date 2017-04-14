@@ -43,7 +43,7 @@ namespace Genus.Modularity.Tests
             var providerMock = new Mock<IPluginProvider>();
             providerMock.Setup(p => p.CandidatePlugins).Returns(new[] { new CandidateDescriptor("test", "test", "test") });
             var loaderMock = new Mock<IPluginLoader>();
-            loaderMock.Setup(l => l.LoadPlugin(It.IsAny<CandidateDescriptor>()))
+            loaderMock.Setup(l => l.LoadPlugin(It.IsAny<CandidateDescriptor>(), null))
                       .Returns(new PluginDescriptor(plugin, null, null, null));
 
             var serviceCollection = new ServiceCollection();
@@ -51,7 +51,7 @@ namespace Genus.Modularity.Tests
 
             target.ConfigureServices(serviceCollection);
 
-            loaderMock.Verify(l => l.LoadPlugin(It.IsAny<CandidateDescriptor>()), Times.Once);
+            loaderMock.Verify(l => l.LoadPlugin(It.IsAny<CandidateDescriptor>(), null), Times.Once);
             Assert.True(plugin.ConfigureServicesCalled, "CofigureServices not called");
         }
 
@@ -61,7 +61,7 @@ namespace Genus.Modularity.Tests
             var providerMock = new Mock<IPluginProvider>();
             var loaderMock = new Mock<IPluginLoader>();
             providerMock.Setup(l => l.CandidatePlugins).Returns(new CandidateDescriptor[0]);
-            loaderMock.Setup(l => l.LoadPlugin(It.IsAny<CandidateDescriptor>())).Returns((PluginDescriptor)null);
+            loaderMock.Setup(l => l.LoadPlugin(It.IsAny<CandidateDescriptor>(), null)).Returns((PluginDescriptor)null);
 
             var serviceCollection = new ServiceCollection();
             var target = new PluginManager(providerMock.Object ,loaderMock.Object);

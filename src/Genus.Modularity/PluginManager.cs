@@ -10,7 +10,7 @@ namespace Genus.Modularity
 {
     public sealed class PluginManager: IPluginManager
     {
-        private IList<PluginDescriptor> pluginDescriptorsList;
+        private Lazy<IList<PluginDescriptor>> pluginDescriptorsList;
         private IPluginLoader Loader { get; }
         private IPluginProvider Provider { get; }
         private ILogger Logger { get;  }
@@ -24,36 +24,42 @@ namespace Genus.Modularity
             Provider = provider;
             Loader = loader;
             Logger = logger;
+            pluginDescriptorsList = new Lazy<IList<PluginDescriptor>>(() => LoadPlugins().ToList());
         }
 
         public IEnumerable<PluginDescriptor> LoadedPlugins
         {
             get
             {
-                if (pluginDescriptorsList == null)
-                    return Enumerable.Empty<PluginDescriptor>();
-                return pluginDescriptorsList.Select(p => p);
+                return pluginDescriptorsList.Value.Select(p => p);
             }
         }
 
         public PluginDescriptor this[TypeInfo type]
             => LoadedPlugins.SingleOrDefault(t => t.Assembly == type.Assembly);
 
+        bool isConfigureServicesCalled = false;
         public void ConfigureServices(IServiceCollection serviceCollection)
         {
-            if (this.pluginDescriptorsList != null)
+            if (isConfigureServicesCalled)
                 throw new InvalidOperationException("Already inizialized");
+            isConfigureServicesCalled = true;
+            foreach (var descriptor in LoadedPlugins)
+            {
+                    descriptor.Plugin.ConfigureServices(serviceCollection);
+            }
+        }
 
+        private IEnumerable<PluginDescriptor> LoadPlugins()
+        {
             Logger?.LogInformation("Begin load plugins");
-            pluginDescriptorsList = new List<PluginDescriptor>();
             foreach (var candidate in Provider.CandidatePlugins)
             {
+                Logger?.LogInformation($"Load plugin from {candidate.PluginName}");
+                PluginDescriptor descriptor;
                 try
                 {
-                    Logger?.LogInformation($"Load plugins from {candidate.PluginName}");
-                    var descriptor = Loader.LoadPlugin(candidate);
-                    pluginDescriptorsList.Add(descriptor);
-                    descriptor.Plugin.ConfigureServices(serviceCollection);
+                    descriptor = Loader.LoadPlugin(candidate);
                 }
                 catch(CreatePluginException ex)
                 {
@@ -61,8 +67,9 @@ namespace Genus.Modularity
                         Logger.LogError(ex.Message);
                     throw;
                 }
+                yield return descriptor;
             }
-            Logger?.LogInformation("End module load");
+            Logger?.LogInformation("End load plugins");
         }
     }
 }
