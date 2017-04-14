@@ -14,7 +14,7 @@ namespace Genus.AspNetCore.Modularity.Tests.Stubs
 
         public string UrlPrefix { get; set; }
 
-        public void Configure(IApplicationBuilder builder)
+        public void Configure(IModularityApplicationBuilder builder)
         {
             ConfigureCalled = true;
         }
