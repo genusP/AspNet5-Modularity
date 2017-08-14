@@ -18,9 +18,7 @@ namespace Genus.Modularity.Tests
         {
             var pluginDir = System.IO.Directory.GetCurrentDirectory();
             var pluginName = GetType().GetTypeInfo().Assembly.GetName().Name;
-            var target = new DirectoryPluginProvider(
-                            new string[] { pluginName }, 
-                            pluginDir);
+            var target = new DirectoryPluginProvider( pluginDir, pluginName);
 
             var result = target.CandidatePlugins;
 

@@ -7,7 +7,7 @@ namespace Genus.Modularity
 {
     public class DirectoryPluginProvider : IPluginProvider
     {
-        public DirectoryPluginProvider(string[] pluginNames=null, string pluginsDirectoryPath=null)
+        public DirectoryPluginProvider(string pluginsDirectoryPath, params string[] pluginNames)
         {
             if (string.IsNullOrWhiteSpace(pluginsDirectoryPath))
                 pluginsDirectoryPath = Directory.GetCurrentDirectory();

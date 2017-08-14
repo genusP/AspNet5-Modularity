@@ -10,27 +10,20 @@ namespace Genus.Modularity
     public class AssemblyPluginLoader<T> : IPluginLoader
         where T:IPlugin
     {
+        static AssemblyPluginLoader()
+        {
+            DefaultPluginDependencyResolver.Attach(); //Attach dependency resolver
+        }
 
         public virtual PluginDescriptor LoadPlugin(CandidateDescriptor candidate, Action<Assembly> onAssemblyLoad = null)
         {
             var assemblyPath = Path.GetFullPath(candidate.AssemblyPath);
             var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
-            Assembly assembly = null;
-            //try get already loaded assembly
-            try
-            {
-                assembly = Assembly.Load(new AssemblyName(assemblyName));
-            }
-            catch (FileNotFoundException) { } //catch exception if assembly not loaded
-            if (assembly == null)
-            {
-#if NET451
-                assembly = Assembly.LoadFile(assemblyPath);
-#else
-                assembly = System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-#endif
-            }
+            var assemblyDir  = Path.GetDirectoryName(assemblyPath);
 
+            Assembly assembly = LoadAssembly(assemblyPath, new AssemblyName( assemblyName));
+
+            DefaultPluginDependencyResolver.AddProbingPath(assemblyDir);
             if (onAssemblyLoad != null)
 #pragma warning disable IDE1005 // Delegate invocation can be simplified.
                 onAssemblyLoad(assembly);
@@ -46,6 +39,22 @@ namespace Genus.Modularity
                     assembly);
             }
             return null;
+        }
+
+        protected virtual Assembly LoadAssembly(string assemblyPath, AssemblyName assemblyName)
+        {
+            //try get already loaded assembly
+            try
+            {
+                return Assembly.Load(assemblyName);
+            }
+            catch (FileNotFoundException) { } //catch exception if assembly not loaded
+
+#if NET451
+            return Assembly.LoadFile(assemblyPath);
+#else
+            return System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+#endif
         }
 
         private IPlugin GetPluginFromAssembly(Assembly assembly)

@@ -8,8 +8,11 @@ namespace Genus.Modularity
 {
     public class ProjectsDirectoryPluginProvider : DirectoryPluginProvider
     {
+        public ProjectsDirectoryPluginProvider(string pluginsDirectoryPath, params string[] pluginNames):this(pluginNames, pluginsDirectoryPath)
+        { }
+
         public ProjectsDirectoryPluginProvider(string[] pluginNames = null, string pluginsDirectoryPath=null, string outputDir=null)
-            : base(pluginNames, pluginsDirectoryPath)
+            : base(pluginsDirectoryPath, pluginNames)
         {
             OutputDir = string.IsNullOrWhiteSpace(outputDir)
                                 ? "bin/Debug"
