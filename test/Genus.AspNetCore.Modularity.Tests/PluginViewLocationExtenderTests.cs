@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using Genus.AspNetCore.Modularity.Tests.Stubs;
-using Genus.AspNetCore.Modularity.ViewFutures;
+using Genus.AspNetCore.Mvc.Modularity;
 using Genus.Modularity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -77,7 +77,7 @@ namespace Genus.AspNetCore.Modularity.Tests
             var services = new ServiceCollection();
             services.Add(new ServiceDescriptor(typeof(IPluginManager), pluginManagerMock.Object));
 
-            var target = new PluginViewLocationExtender();
+            var target = new PluginViewLocationExpander();
             var actionContext = new ActionContext { HttpContext = new DefaultHttpContext { RequestServices = services.BuildServiceProvider() } };
             actionContext.ActionDescriptor = new ControllerActionDescriptor { ControllerTypeInfo = typeof(object).GetTypeInfo() };
             var context = new ViewLocationExpanderContext(

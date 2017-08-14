@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Genus.AspNetCore.Modularity\Genus.AspNetCore.Modularity.csproj" />
+    <ProjectReference Include="..\..\src\Genus.AspNetCore.Mvc.Modularity\Genus.AspNetCore.Mvc.Modularity.csproj" />
     <ProjectReference Include="..\..\src\Genus.Modularity\Genus.Modularity.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>

@@ -19,7 +19,7 @@ namespace Genus.AspNetCore.Modularity
             where TLoader : class, IPluginLoader, new()
             => hostBuilder.UsePluginManager( sp => new PluginManager(pluginProviderFactory(sp), new TLoader(), sp.GetRequiredService<ILogger<PluginManager>>()));
 
-        public static IWebHostBuilder UsePluginManager(this IWebHostBuilder hostBuilder, Func<IServiceProvider,PluginManager> pluginManagerFactory, 
+        public static IWebHostBuilder UsePluginManager(this IWebHostBuilder hostBuilder, Func<IServiceProvider,IPluginManager> pluginManagerFactory, 
                                                             IConfiguration configuration = null)
         {
             var startupAssemblyName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
@@ -34,7 +34,7 @@ namespace Genus.AspNetCore.Modularity
                     Func<IServiceProvider, IStartup> factory = sp =>
                     {
                         var baseStartup = startupDescriptor.ImplementationInstance ?? startupDescriptor.ImplementationFactory(sp);
-                        return new StartupWrapper((IStartup)baseStartup, sp.GetRequiredService<PluginManager>(), configuration);
+                        return new StartupWrapper((IStartup)baseStartup, sp.GetRequiredService<IPluginManager>(), configuration);
                     };
 
                     var serviceDescriptor = new ServiceDescriptor(startupDescriptor.ServiceType, factory, ServiceLifetime.Singleton);

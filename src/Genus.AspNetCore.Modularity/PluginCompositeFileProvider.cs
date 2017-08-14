@@ -4,7 +4,7 @@ using Genus.Modularity;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 
-namespace Genus.AspNetCore.Modularity.ViewFutures
+namespace Genus.AspNetCore.Modularity
 {
     public class PluginCompositeFileProvider : IFileProvider
     {

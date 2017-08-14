@@ -44,7 +44,7 @@ namespace Genus.AspNetCore.Modularity.Internal
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.Replace(new ServiceDescriptor(typeof(PluginManager), PluginManager));
+            services.Replace(new ServiceDescriptor(typeof(IPluginManager), PluginManager));
             Startup.ConfigureServices(services);
 
             PluginManager.ConfigureServices(services);

@@ -1,15 +1,13 @@
-﻿using Genus.Modularity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Razor;
+﻿using System.Collections.Generic;
+using Genus.AspNetCore.Modularity;
+using Genus.Modularity;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Genus.AspNetCore.Modularity.ViewFutures
+namespace Genus.AspNetCore.Mvc.Modularity
 {
-    public class PluginViewLocationExtender : IViewLocationExpander
+    public class PluginViewLocationExpander : IViewLocationExpander
     {
         public IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
         {
