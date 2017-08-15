@@ -1,28 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Genus.Modularity;
 
 namespace Genus.Modularity.NuGet
 {
-    public class NugetPluginProvider:IPluginProvider
+    public class NugetPluginStore<T>:NugetPluginStore
+        where T: IPlugin
     {
-        public NugetPluginProvider(string packageStorePath, params string[] pluginNames) 
+        public NugetPluginStore(string packageStorePath, params string[] pluginNames) 
             :this(new FolderPackageStrore(packageStorePath), pluginNames)
         {
 
         }
-        public NugetPluginProvider(IPackageStore store, params string[] pluginNames)
+
+        public NugetPluginStore(IPackageStore store, params string[] pluginNames)
+            :base(store, new NugetPluginLoader<T>(store), pluginNames)
         {
+
+        }
+    }
+
+    public class NugetPluginStore: IPluginStore
+    {
+        
+        public NugetPluginStore(IPackageStore store, IPluginLoader pluginLoader, params string[] pluginNames)
+        {
+            PluginLoader = pluginLoader ?? throw new ArgumentNullException(nameof(pluginLoader));
             _store = store;
             _pluginNames = pluginNames;
         }
 
         readonly string[] _pluginNames;
         readonly IPackageStore _store;
+
+        public IPluginLoader PluginLoader { get; }
 
         public IEnumerable<CandidateDescriptor> CandidatePlugins
         {

@@ -11,18 +11,15 @@ namespace Genus.Modularity
     public sealed class PluginManager: IPluginManager
     {
         private Lazy<IList<PluginDescriptor>> pluginDescriptorsList;
-        private IPluginLoader Loader { get; }
-        private IPluginProvider Provider { get; }
+        private IPluginStore Store { get; }
         private ILogger Logger { get;  }
 
-        public PluginManager(IPluginProvider provider, IPluginLoader loader, ILogger logger = null)
+        public PluginManager(IPluginStore store, ILogger logger = null)
         {
-            if (provider == null)
-                throw new ArgumentNullException(nameof(provider));
-            if (loader == null)
-                throw new ArgumentNullException(nameof(loader));
-            Provider = provider;
-            Loader = loader;
+            if (store == null)
+                throw new ArgumentNullException(nameof(store));
+
+            Store = store;
             Logger = logger;
             pluginDescriptorsList = new Lazy<IList<PluginDescriptor>>(() => LoadPlugins().ToList());
         }
@@ -46,20 +43,20 @@ namespace Genus.Modularity
             isConfigureServicesCalled = true;
             foreach (var descriptor in LoadedPlugins)
             {
-                    descriptor.Plugin.ConfigureServices(serviceCollection);
+                descriptor.Plugin.ConfigureServices(serviceCollection);
             }
         }
 
         private IEnumerable<PluginDescriptor> LoadPlugins()
         {
             Logger?.LogInformation("Begin load plugins");
-            foreach (var candidate in Provider.CandidatePlugins)
+            foreach (var candidate in Store.CandidatePlugins)
             {
                 Logger?.LogInformation($"Load plugin from {candidate.PluginName}");
                 PluginDescriptor descriptor;
                 try
                 {
-                    descriptor = Loader.LoadPlugin(candidate);
+                    descriptor = Store.PluginLoader.LoadPlugin(candidate);
                 }
                 catch(CreatePluginException ex)
                 {

@@ -15,19 +15,17 @@ namespace Genus.Modularity.Tests
         [Fact]
         public void Ctor_argumnet_not_null()
         {
-            Action act = ()=> new PluginManager(null, new Mock<IPluginLoader>().Object);
-            Action act2 = ()=> new PluginManager(new Mock<IPluginProvider>().Object, null);
+            Action act = ()=> new PluginManager(null);
 
-            Assert.Throws<ArgumentNullException>("provider", act);
-            Assert.Throws<ArgumentNullException>("loader", act2);
+            Assert.Throws<ArgumentNullException>("store", act);
         }
 
         [Fact]
         public void LoadedPlugins_ReturnEmpty_IfNotCallLoad()
         {
-            var providerMock = new Mock<IPluginProvider>();
+            var providerMock = new Mock<IPluginStore>();
             var loaderMock = new Mock<IPluginLoader>();
-            var target = new PluginManager(providerMock.Object, loaderMock.Object);
+            var target = new PluginManager(providerMock.Object);
 
             var result = target.LoadedPlugins;
 
@@ -40,14 +38,15 @@ namespace Genus.Modularity.Tests
         {
             var plugin = new ModuleStub();
 
-            var providerMock = new Mock<IPluginProvider>();
-            providerMock.Setup(p => p.CandidatePlugins).Returns(new[] { new CandidateDescriptor("test", "test", "test") });
             var loaderMock = new Mock<IPluginLoader>();
             loaderMock.Setup(l => l.LoadPlugin(It.IsAny<CandidateDescriptor>(), null))
                       .Returns(new PluginDescriptor(plugin, null, null, null));
+            var providerMock = new Mock<IPluginStore>();
+            providerMock.Setup(p => p.PluginLoader).Returns(loaderMock.Object);
+            providerMock.Setup(p => p.CandidatePlugins).Returns(new[] { new CandidateDescriptor("test", "test", "test") });
 
             var serviceCollection = new ServiceCollection();
-            var target = new PluginManager(providerMock.Object, loaderMock.Object);
+            var target = new PluginManager(providerMock.Object);
 
             target.ConfigureServices(serviceCollection);
 
@@ -58,13 +57,14 @@ namespace Genus.Modularity.Tests
         [Fact]
         public void ConfigureServices_throw_many_initialize()
         {
-            var providerMock = new Mock<IPluginProvider>();
             var loaderMock = new Mock<IPluginLoader>();
-            providerMock.Setup(l => l.CandidatePlugins).Returns(new CandidateDescriptor[0]);
             loaderMock.Setup(l => l.LoadPlugin(It.IsAny<CandidateDescriptor>(), null)).Returns((PluginDescriptor)null);
+            var providerMock = new Mock<IPluginStore>();
+            providerMock.Setup(l => l.CandidatePlugins).Returns(new CandidateDescriptor[0]);
+            providerMock.Setup(p => p.PluginLoader).Returns(loaderMock.Object);
 
             var serviceCollection = new ServiceCollection();
-            var target = new PluginManager(providerMock.Object ,loaderMock.Object);
+            var target = new PluginManager(providerMock.Object);
 
             target.ConfigureServices(serviceCollection);
             Action init2 = ()=> target.ConfigureServices(serviceCollection);

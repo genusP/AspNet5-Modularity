@@ -5,10 +5,22 @@ using System;
 
 namespace Genus.Modularity
 {
-    public class DirectoryPluginProvider : IPluginProvider
+    public class DirectoryPluginStore<T> : DirectoryPluginStore
+        where T:IPlugin
     {
-        public DirectoryPluginProvider(string pluginsDirectoryPath, params string[] pluginNames)
+        public DirectoryPluginStore(string pluginsDirectoryPath, params string[] pluginNames)
+            : base(pluginsDirectoryPath, new AssemblyPluginLoader<T>(), pluginNames)
         {
+
+        }
+    }
+
+    public class DirectoryPluginStore : IPluginStore
+    {        
+        public DirectoryPluginStore(string pluginsDirectoryPath, IPluginLoader pluginLoader, params string[] pluginNames)
+        {
+            PluginLoader = pluginLoader ?? throw new ArgumentNullException(nameof(pluginLoader)) ;
+
             if (string.IsNullOrWhiteSpace(pluginsDirectoryPath))
                 pluginsDirectoryPath = Directory.GetCurrentDirectory();
 
@@ -18,6 +30,8 @@ namespace Genus.Modularity
 
         protected string[] PluginNames { get; }
         protected string PluginsDirectoryPath { get; }
+
+        public IPluginLoader PluginLoader { get; }
 
         public virtual IEnumerable<CandidateDescriptor> CandidatePlugins
         {

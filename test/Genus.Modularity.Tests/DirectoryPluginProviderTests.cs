@@ -1,11 +1,8 @@
-﻿using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using Microsoft.Extensions.Logging;
-using Genus.Modularity.Tests.Stubs;
 using System.Reflection;
 
 namespace Genus.Modularity.Tests
@@ -18,7 +15,7 @@ namespace Genus.Modularity.Tests
         {
             var pluginDir = System.IO.Directory.GetCurrentDirectory();
             var pluginName = GetType().GetTypeInfo().Assembly.GetName().Name;
-            var target = new DirectoryPluginProvider( pluginDir, pluginName);
+            var target = new DirectoryPluginStore<IPlugin>( pluginDir, pluginName);
 
             var result = target.CandidatePlugins;
 

@@ -6,19 +6,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 
 namespace Genus.AspNetCore.Modularity
 {
     public static class WebHostBuilderExtensions
     {
-        public static IWebHostBuilder UsePluginManager(this IWebHostBuilder hostBuilder, Func<IServiceProvider, IPluginProvider> pluginProviderFactory)
-            => hostBuilder.UsePluginManager<AssemblyPluginLoader<IPlugin>>(pluginProviderFactory);
-
-        public static IWebHostBuilder UsePluginManager<TLoader>(this IWebHostBuilder hostBuilder, Func<IServiceProvider, IPluginProvider> pluginProviderFactory)
-            where TLoader : class, IPluginLoader, new()
-            => hostBuilder.UsePluginManager( sp => new PluginManager(pluginProviderFactory(sp), new TLoader(), sp.GetRequiredService<ILogger<PluginManager>>()));
-
         public static IWebHostBuilder UsePluginManager(this IWebHostBuilder hostBuilder, Func<IServiceProvider,IPluginManager> pluginManagerFactory, 
                                                             IConfiguration configuration = null)
         {
