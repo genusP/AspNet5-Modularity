@@ -47,14 +47,55 @@ namespace Genus.AspNetCore.Modularity
             public List<Func<RequestDelegate, RequestDelegate>> Middlewares { get; } = new List<Func<RequestDelegate, RequestDelegate>>();
         }
 
-        public static IModularityApplicationBuilder UseMiddlewareBefore<TMiddleware, TBeforeMiddleware>( 
-                this IModularityApplicationBuilder builder, 
+        public static IModularityApplicationBuilder UseBefore<TMiddleware>(this IModularityApplicationBuilder builder, Func<RequestDelegate, RequestDelegate> middleware)
+            => builder.UseBefore(typeof(TMiddleware), middleware);
+
+        public static IModularityApplicationBuilder UseAfter<TMiddleware>(this IModularityApplicationBuilder builder, Func<RequestDelegate, RequestDelegate> middleware)
+            => builder.UseAfter(typeof(TMiddleware), middleware);
+
+        public static IModularityApplicationBuilder UseFirst(
+                this IModularityApplicationBuilder builder,
+                Action<IApplicationBuilder> useAction)
+        {
+            builder.internalUseMiddleware(useAction, (b, m) => b.UseFirst(m));
+            return builder;
+        }
+
+        public static IModularityApplicationBuilder UseBefore<TBeforeMiddleware>(
+                this IModularityApplicationBuilder builder,
+                     Action<IApplicationBuilder> useAction)
+        {
+            builder.internalUseMiddleware(useAction, (b, m) => b.UseBefore<TBeforeMiddleware>(m));
+            return builder;
+        }
+
+        public static IModularityApplicationBuilder UseAfter<TAfterMiddleware>(
+               this IModularityApplicationBuilder builder,
+                    Action<IApplicationBuilder> useAction)
+        {
+            builder.internalUseMiddleware( useAction,(b, m) => b.UseAfter<TAfterMiddleware>(m));
+            return builder;
+        }
+
+        public static IModularityApplicationBuilder UseMiddlewareFirst<TMiddleware>(
+                this IModularityApplicationBuilder builder,
               params object[] args)
         {
             internalUseMiddleware<TMiddleware>(
                 builder,
-                (b, m) => b.UseBefore<TBeforeMiddleware>(m),
+                (b, m) => b.UseFirst(m),
                 args);
+            return builder;
+        }
+
+        public static IModularityApplicationBuilder UseMiddlewareBefore<TMiddleware, TBeforeMiddleware>( 
+                this IModularityApplicationBuilder builder, 
+              params object[] args)
+        {
+            builder.internalUseMiddleware<TMiddleware>(
+                (b, m) => b.UseBefore<TBeforeMiddleware>(m),
+                args
+            );
             return builder;
         }
 
@@ -73,9 +114,16 @@ namespace Genus.AspNetCore.Modularity
             this IModularityApplicationBuilder builder,
                  Action<IModularityApplicationBuilder, Func<RequestDelegate, RequestDelegate>> useAction,
           params object[] args)
+            => builder.internalUseMiddleware(ab => ab.UseMiddleware<TMiddleware>(args), useAction);
+
+        private static void internalUseMiddleware(
+            this IModularityApplicationBuilder builder,
+                 Action<InternalAppBuilder> middlewareFactory,
+                 Action<IModularityApplicationBuilder, Func<RequestDelegate, RequestDelegate>> useAction,
+          params object[] args)
         {
             var internalAB = new InternalAppBuilder(builder);
-            internalAB.UseMiddleware<TMiddleware>(args);
+            middlewareFactory(internalAB);
             foreach (var item in internalAB.Middlewares)
             {
                 useAction(builder, item);

@@ -65,19 +65,24 @@ namespace Genus.AspNetCore.Modularity.Internal
             }
         }
 
-        public IModularityApplicationBuilder UseBefore<TBeforeMiddleware>(Func<RequestDelegate, RequestDelegate> middleware)
+        public IModularityApplicationBuilder UseFirst(Func<RequestDelegate, RequestDelegate> middleware)
         {
-            var prevMidleware = _midlewares.FirstOrDefault(mi => mi.MidlewareType == typeof(TBeforeMiddleware));
-            int pos = _midlewares.Count;
+            Use(middleware, 0);
+            return this;
+        }
+        public IModularityApplicationBuilder UseBefore(Type beforeMiddlewareType, Func<RequestDelegate, RequestDelegate> middleware)
+        {
+            var prevMidleware = _midlewares.FirstOrDefault(mi => mi.MidlewareType == beforeMiddlewareType);
+            int pos = 0;
             if (prevMidleware != null)
                 pos = _midlewares.IndexOf(prevMidleware);
             Use(middleware, pos);
             return this;
         }
 
-        public IModularityApplicationBuilder UseAfter<TAfterMiddleware>(Func<RequestDelegate, RequestDelegate> middleware)
+        public IModularityApplicationBuilder UseAfter(Type afterMiddlewareType, Func<RequestDelegate, RequestDelegate> middleware)
         {
-            var prevMidleware = _midlewares.LastOrDefault(mi => mi.MidlewareType == typeof(TAfterMiddleware));
+            var prevMidleware = _midlewares.LastOrDefault(mi => mi.MidlewareType == afterMiddlewareType);
             int pos = _midlewares.Count;
             if (prevMidleware != null)
                 pos = _midlewares.IndexOf(prevMidleware)+1;

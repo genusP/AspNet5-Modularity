@@ -8,7 +8,8 @@ namespace Genus.AspNetCore.Modularity
 {
     public interface IModularityApplicationBuilder : IApplicationBuilder
     {
-        IModularityApplicationBuilder UseBefore<TMiddleware>(Func<RequestDelegate, RequestDelegate> middleware);
-        IModularityApplicationBuilder UseAfter<TMiddleware>(Func<RequestDelegate, RequestDelegate> middleware);
+        IModularityApplicationBuilder UseFirst(Func<RequestDelegate, RequestDelegate> middleware);
+        IModularityApplicationBuilder UseBefore(Type beforeMiddelwareType, Func<RequestDelegate, RequestDelegate> middleware);
+        IModularityApplicationBuilder UseAfter(Type afterMiddelwareType, Func<RequestDelegate, RequestDelegate> middleware);
     }
 }
