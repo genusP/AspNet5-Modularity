@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6;net451</TargetFrameworks>
-    <Version>1.0.0-alpha3-1708141</Version>
+    <TargetFrameworks>netstandard1.6;net451;netstandard2.0</TargetFrameworks>
+    <Version>1.0.0-alpha4-1708161</Version>
     <Authors>Pundikov Gennady</Authors>
     <Company />
     <Description />
@@ -12,8 +12,11 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="1.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
