@@ -8,7 +8,7 @@ namespace Genus.Modularity
 {
     public sealed class PluginDescriptor
     {
-        internal PluginDescriptor(IPlugin plugin, string description, string pluginRoot, Assembly assembly)
+        public PluginDescriptor(IPlugin plugin, string description, string pluginRoot, Assembly assembly)
         {
             Plugin = plugin;
             Description = description;
