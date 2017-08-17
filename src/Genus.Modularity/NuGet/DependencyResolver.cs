@@ -47,16 +47,28 @@ namespace Genus.Modularity.NuGet
 
         public static void AddDefaultStore()
         {
-            var store = GetDefaultStore();
-            if (store != null)
+            foreach(var store in GetDefaultStores())
                 PackageStores.Add(store);
         }
 
-        private static IPackageStore GetDefaultStore()
+        private static IEnumerable<IPackageStore> GetDefaultStores()
         {
             var profilePath = Environment.GetEnvironmentVariable("USERPROFILE");
             var storePath = Path.Combine(profilePath, ".nuget", "packages");
-            return new FolderPackageStrore(storePath);
+            yield return new FolderPackageStrore(storePath);
+#if NETSTANDARD2_0
+            var coreapp2store = GetDefaultNetCoreApp2Store();
+            if (coreapp2store != null)
+                yield return coreapp2store;
+        }
+
+        private static IPackageStore GetDefaultNetCoreApp2Store()
+        {
+            var storePath = @"C:\Program Files\dotnet\store\x64\netcoreapp2.0";
+            if(Directory.Exists(storePath))
+                return new FolderPackageStrore( storePath);
+            return null;
+#endif
         }
     }
 }

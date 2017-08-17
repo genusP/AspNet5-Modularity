@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using NuGet.Frameworks;
 
 namespace Genus.Modularity.NuGet
 {
@@ -36,18 +35,10 @@ namespace Genus.Modularity.NuGet
                 {
                     assemblyPath = null;
 
-                    string frameworkName = Assembly.GetEntryAssembly()
-                                                .GetCustomAttributes<System.Runtime.Versioning.TargetFrameworkAttribute>()
-                                                .Select(x => x.FrameworkName)
-                                                .FirstOrDefault();
-                    var currentFramework = NuGetFramework.ParseFrameworkName(frameworkName, new DefaultFrameworkNameProvider());
-
                     foreach (var libFrameworkPath in Directory.GetDirectories(libPath))
                     {
                         var ngFwName = Path.GetFileName(libFrameworkPath);
-                        var packageFramework = NuGetFramework.ParseFolder(ngFwName);
-                        if (packageFramework != null
-                           && DefaultCompatibilityProvider.Instance.IsCompatible(currentFramework, packageFramework))
+                        if (PlatformInformation.IsCompatibleFramework(ngFwName))
                         {
                             assemblyPath = Path.Combine(libFrameworkPath, fileName);
                             break;
