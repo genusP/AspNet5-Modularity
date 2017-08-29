@@ -65,13 +65,17 @@ namespace Genus.Modularity.NuGet
         private string GetPackagePath(AssemblyName assemblyName)
         {
             var packagePath = Path.Combine(_storePath, assemblyName.Name);
-            var packageVersions = GetPackageVersions(packagePath).OrderByDescending(_ => _.Value.Key);
+            if (Directory.Exists(packagePath))
+            {
+                var packageVersions = GetPackageVersions(packagePath).OrderByDescending(_ => _.Value.Key);
 
-            if (assemblyName.Version == null) //if no version info return max version
-                return packageVersions.First().Value.Value;
+                if (assemblyName.Version == null) //if no version info return max version
+                    return packageVersions.First().Value.Value;
 
-            else
-                return packageVersions.FirstOrDefault(v => IsCompatibilityVersion(assemblyName.Version, v.Value.Key))?.Value;
+                else
+                    return packageVersions.FirstOrDefault(v => IsCompatibilityVersion(assemblyName.Version, v.Value.Key))?.Value;
+            }
+            return null;
         }
 
         private IEnumerable<KeyValuePair<Version, string>?> GetPackageVersions(string packagePath)
