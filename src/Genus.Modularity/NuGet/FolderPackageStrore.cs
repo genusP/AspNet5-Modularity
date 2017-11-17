@@ -67,7 +67,7 @@ namespace Genus.Modularity.NuGet
             var packagePath = Path.Combine(_storePath, assemblyName.Name);
             if (Directory.Exists(packagePath))
             {
-                var packageVersions = GetPackageVersions(packagePath).OrderByDescending(_ => _.Value.Key);
+                var packageVersions = GetPackageVersions(packagePath).OrderBy(_ => _.Value.Key);
 
                 if (assemblyName.Version == null) //if no version info return max version
                     return packageVersions.First().Value.Value;
@@ -90,12 +90,14 @@ namespace Genus.Modularity.NuGet
         private static bool IsCompatibilityVersion(Version v1, Version v2)
         {
             Func<int,int> defRevision = (a) => a == -1 ? 0 : a;
+            var v2Revision = (defRevision(v2.MajorRevision) >> 16) + defRevision(v2.MinorRevision);
+            var v1Revision = (defRevision(v1.MajorRevision) << 16) + defRevision(v2.MinorRevision);
             return v1.Major == v2.Major && v1.Minor == v2.Minor 
                 && (
-                    v2.MajorRevision>v1.MajorRevision 
+                    defRevision(v2.Build)> defRevision(v1.Build)
                     || (
-                          defRevision(v2.MajorRevision) == defRevision(v1.MajorRevision) 
-                       && defRevision(v2.MinorRevision) >= defRevision(v1.MinorRevision)
+                        defRevision(v2.Build) == defRevision(v1.Build) 
+                        && v2Revision>= v1Revision
                        )
                     );
         }
