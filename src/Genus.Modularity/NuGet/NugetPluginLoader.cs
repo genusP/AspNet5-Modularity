@@ -15,7 +15,6 @@ namespace Genus.Modularity.NuGet
 
         static NugetPluginLoader()
         {
-            DependencyResolver.Attach();
         }
 
         public NugetPluginLoader(string packageStorePath) : this(packageStorePath, false) { }
@@ -29,6 +28,7 @@ namespace Genus.Modularity.NuGet
             DependencyResolver.PackageStores.Add(packageStore);
             if (useDefaultStore)
                 DependencyResolver.AddDefaultStore();
-        }        
+            DependencyResolver.Attach();
+        }
     }
 }

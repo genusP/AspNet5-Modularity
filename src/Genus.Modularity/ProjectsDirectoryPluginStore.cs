@@ -22,8 +22,8 @@ namespace Genus.Modularity
     {
         static ProjectsDirectoryPluginStore()
         {
-            NuGet.DependencyResolver.Attach();
             NuGet.DependencyResolver.AddDefaultStore();
+            NuGet.DependencyResolver.Attach();
         }
         public ProjectsDirectoryPluginStore(string pluginsDirectoryPath, IPluginLoader loader, params string[] pluginNames)
             :this(pluginsDirectoryPath, loader, null, pluginNames)

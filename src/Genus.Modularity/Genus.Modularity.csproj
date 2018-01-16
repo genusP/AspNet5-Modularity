@@ -10,11 +10,15 @@
     <PackageProjectUrl>https://github.com/genusP/Genus.Modularity</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/genusP/Genus.Modularity/blob/master/LICENSE</PackageLicenseUrl>
     <Description />
-    <Version>1.0.0-alpha4-1711171</Version>
-    <AssemblyVersion>1.0.0.20</AssemblyVersion>
-    <FileVersion>1.0.0.20</FileVersion>
+    <Version>1.0.0-alpha5-1801162</Version>
+    <AssemblyVersion>1.0.0.25</AssemblyVersion>
+    <FileVersion>1.0.0.25</FileVersion>
     <Authors>Pundikov Gennady</Authors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'!='net451'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
@@ -26,10 +30,12 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Metadata" Version="1.4.1" />
   </ItemGroup>
     
   <ItemGroup>
     <PackageReference Include="NuGet.Frameworks" Version="4.3.0" />
+    <PackageReference Include="NuGet.Versioning" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
@@ -39,6 +45,7 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <PackageReference Include="System.Runtime.Loader" Version="4.0.0" />
+    <PackageReference Include="System.Reflection.Metadata" Version="1.4.1" />
   </ItemGroup>
 
   <ItemGroup>

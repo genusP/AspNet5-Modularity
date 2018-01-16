@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NuGet.Versioning;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,9 +11,20 @@ namespace Genus.Modularity.NuGet
 {
     public class FolderPackageStrore : IPackageStore
     {
+        struct CandidateItem {
+            public CandidateItem(PackageDescriptor package, int priority)
+            {
+                Package = package ?? throw new ArgumentNullException(nameof(package));
+                Priority = priority;
+            }
+            public PackageDescriptor Package { get; }
+            public int Priority { get; set; }
+        }
+
         readonly string _storePath;
         public FolderPackageStrore(string storePath)
         {
+            new NuGetVersion("1"); //for preload assembly
             if (!Directory.Exists(storePath))
                 throw new DirectoryNotFoundException(storePath);
             _storePath = Path.GetFullPath(storePath);
@@ -24,35 +36,114 @@ namespace Genus.Modularity.NuGet
             if (assemblyName.Name.StartsWith( typeof(File).GetTypeInfo().Assembly.GetName().Name))
                 return null;
 
-            var packagePath = GetPackagePath(assemblyName);
-            if (!string.IsNullOrEmpty(packagePath))
+            var packagePath = Path.Combine(_storePath, assemblyName.Name);
+            if (Directory.Exists(packagePath))
             {
-                var libPath = Path.Combine(packagePath, "lib");
-                var contentPath = GetContentPath(packagePath);
-                var fileName = assemblyName.Name + ".dll";
-                var assemblyPath = Path.Combine(libPath, fileName);
-                if (!File.Exists(assemblyPath))
+                var packageVersions = GetPackageVersions(packagePath).OrderBy(_ => _.Item1);
+                CandidateItem[] candidates = null;
+                
+                //if no version info return max version
+                if (assemblyName.Version == null) 
                 {
-                    assemblyPath = null;
-
-                    foreach (var libFrameworkPath in Directory.GetDirectories(libPath))
+                    var path = packageVersions.First().Item2;
+                    var pDescriptor = FindPackage(assemblyName, path);
+                    candidates = new CandidateItem[] { new CandidateItem(pDescriptor, 0) };
+                }
+                else
+                {
+                    var asmVersion = new NuGetVersion(assemblyName.Version);
+                    //if exist package with version full equals of assembly version
+                    var eqPkgVersion = packageVersions.FirstOrDefault(pv => pv.Item1 == asmVersion);
+                    if (eqPkgVersion != null)
                     {
-                        var ngFwName = Path.GetFileName(libFrameworkPath);
-                        if (PlatformInformation.IsCompatibleFramework(ngFwName))
-                        {
-                            assemblyPath = Path.Combine(libFrameworkPath, fileName);
-                            break;
-                        }
+                        var path = eqPkgVersion.Item2;
+                        var pDescriptor = FindPackage(assemblyName, path);
+                        candidates = new CandidateItem[] { new CandidateItem(pDescriptor, 0) };
+                    }
+                    else
+                    {
+                        var asmVersionWithoutRevision = new NuGetVersion(asmVersion.Major, asmVersion.Minor, asmVersion.Patch);
+                        //find all packages
+                        candidates = (from pv in packageVersions
+                                      let path = pv.Item2
+                                      where CompareVersion(pv.Item1, asmVersionWithoutRevision) >=0
+                                      let pDescriptor = FindPackage(assemblyName, path)
+                                      let priority = CompareVersion(new NuGetVersion(pDescriptor.AssemblyVersion), asmVersion)
+                                      where priority >=0
+                                      select new CandidateItem(
+                                          pDescriptor,
+                                          priority
+                                          )
+                            ).ToArray();
                     }
                 }
-                return new PackageDescriptor
+                if (candidates.Length > 0)
                 {
-                    AssemblyPath = assemblyPath,
-                    ContentPath = contentPath
-                };
+                    var candidate = candidates.OrderBy(_ => _.Priority)
+                                              .ThenByDescending(_ => _.Package.AssemblyVersion)
+                                              .First();
+                    return candidate.Package;
+                }
             }
             return null;
         }
+
+        private PackageDescriptor FindPackage(AssemblyName assemblyName, string packagePath)
+        {
+            var libPath = Path.Combine(packagePath, "lib");
+            var contentPath = GetContentPath(packagePath);
+            var fileName = assemblyName.Name + ".dll";
+            var assemblyPath = Path.Combine(libPath, fileName);
+            if (!File.Exists(assemblyPath))
+            {
+                assemblyPath = null;
+
+                foreach (var libFrameworkPath in Directory.GetDirectories(libPath))
+                {
+                    var ngFwName = Path.GetFileName(libFrameworkPath);
+                    if (PlatformInformation.IsCompatibleFramework(ngFwName))
+                    {
+                        assemblyPath = Path.Combine(libFrameworkPath, fileName);
+                        break;
+                    }
+                }
+            }
+            return new PackageDescriptor
+            {
+                AssemblyPath = assemblyPath,
+                ContentPath = contentPath,
+                AssemblyVersion = GetAssemblyVersion(assemblyPath)
+            };
+        }
+
+#if !NET451
+        private static Version GetAssemblyVersion(string path)
+        {
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+            {
+                using (var fileStream = File.OpenRead(path))
+                {
+                    using (var peReader = new System.Reflection.PortableExecutable.PEReader(fileStream))
+                    {
+                        var mdMemoryBlock = peReader.GetMetadata();
+                        unsafe
+                        {
+                            var metadataReader = new System.Reflection.Metadata.MetadataReader(
+                                mdMemoryBlock.Pointer,
+                                mdMemoryBlock.Length);
+
+                            var asmDef = metadataReader.GetAssemblyDefinition();
+                            return asmDef.Version;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+#else
+        private static Version GetAssemblyVersion(string path)
+            => Assembly.ReflectionOnlyLoadFrom(path).GetName().Version;
+#endif
 
         private static string GetContentPath(string packagePath)
         {
@@ -62,44 +153,16 @@ namespace Genus.Modularity.NuGet
             return null;
         }
 
-        private string GetPackagePath(AssemblyName assemblyName)
-        {
-            var packagePath = Path.Combine(_storePath, assemblyName.Name);
-            if (Directory.Exists(packagePath))
-            {
-                var packageVersions = GetPackageVersions(packagePath).OrderBy(_ => _.Value.Key);
-
-                if (assemblyName.Version == null) //if no version info return max version
-                    return packageVersions.First().Value.Value;
-
-                else
-                    return packageVersions.FirstOrDefault(v => IsCompatibilityVersion(assemblyName.Version, v.Value.Key))?.Value;
-            }
-            return null;
-        }
-
-        private IEnumerable<KeyValuePair<Version, string>?> GetPackageVersions(string packagePath)
+        private IEnumerable<Tuple<NuGetVersion, string>> GetPackageVersions(string packagePath)
         {
             foreach (var p in Directory.GetDirectories(packagePath))
             {
-                if (Version.TryParse(Path.GetFileName(p), out var version))
-                    yield return new KeyValuePair<Version, string>(version, p);
+                if (NuGetVersion.TryParse(Path.GetFileName(p), out var version))
+                    yield return new Tuple<NuGetVersion, string>(version, p);
             }
         }
 
-        private static bool IsCompatibilityVersion(Version v1, Version v2)
-        {
-            Func<int,int> defRevision = (a) => a == -1 ? 0 : a;
-            var v2Revision = (defRevision(v2.MajorRevision) >> 16) + defRevision(v2.MinorRevision);
-            var v1Revision = (defRevision(v1.MajorRevision) << 16) + defRevision(v2.MinorRevision);
-            return v1.Major == v2.Major && v1.Minor == v2.Minor 
-                && (
-                    defRevision(v2.Build)> defRevision(v1.Build)
-                    || (
-                        defRevision(v2.Build) == defRevision(v1.Build) 
-                        && v2Revision>= v1Revision
-                       )
-                    );
-        }
+        private int CompareVersion(NuGetVersion v1, NuGetVersion v2)
+            => VersionComparer.Compare(v1, v2, VersionComparison.Version);
     }
 }
