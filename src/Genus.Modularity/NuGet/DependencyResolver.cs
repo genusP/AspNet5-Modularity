@@ -41,7 +41,10 @@ namespace Genus.Modularity.NuGet
         private static string GetAssemblyPath(AssemblyName assemblyName)
         {
             return PackageStores
-                .Select(s => s.GetPackageDescriptor(assemblyName)?.AssemblyPath)
+                .SelectMany(s => s.GetCandidates(assemblyName))
+                .OrderBy(c=>c.Priority)
+                .ThenByDescending(c=>c.Package.AssemblyVersion)
+                .Select(c => c.Package.AssemblyPath)
                 .FirstOrDefault(ap => ap != null);
         }
 

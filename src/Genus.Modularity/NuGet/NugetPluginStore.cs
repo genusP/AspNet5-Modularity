@@ -42,7 +42,11 @@ namespace Genus.Modularity.NuGet
             get
             {
                 return from pn in _pluginNames
-                       let packageDescriptor = _store.GetPackageDescriptor(new AssemblyName(pn))
+                       let packageDescriptor = _store.GetCandidates(new AssemblyName(pn))
+                                                .OrderBy(c=>c.Priority)
+                                                .ThenByDescending(c=>c.Package.AssemblyVersion)
+                                                .Select(c=>c.Package)
+                                                .FirstOrDefault()
                        where packageDescriptor !=null
                        select new CandidateDescriptor(pn, packageDescriptor.AssemblyPath, packageDescriptor.ContentPath);
             }

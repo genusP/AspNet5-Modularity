@@ -9,6 +9,6 @@ namespace Genus.Modularity.NuGet
 {
     public interface IPackageStore
     {
-        PackageDescriptor GetPackageDescriptor(AssemblyName assemblyName);
+        IEnumerable<PackageCandidateItem> GetCandidates(AssemblyName assemblyName);
     }
 }

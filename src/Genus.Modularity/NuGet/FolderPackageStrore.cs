@@ -11,15 +11,7 @@ namespace Genus.Modularity.NuGet
 {
     public class FolderPackageStrore : IPackageStore
     {
-        struct CandidateItem {
-            public CandidateItem(PackageDescriptor package, int priority)
-            {
-                Package = package ?? throw new ArgumentNullException(nameof(package));
-                Priority = priority;
-            }
-            public PackageDescriptor Package { get; }
-            public int Priority { get; set; }
-        }
+        
 
         readonly string _storePath;
         public FolderPackageStrore(string storePath)
@@ -30,24 +22,28 @@ namespace Genus.Modularity.NuGet
             _storePath = Path.GetFullPath(storePath);
         }
 
-        public PackageDescriptor GetPackageDescriptor(AssemblyName assemblyName)
+        public IDictionary<string, string> AssemblyToPackageMapping { get; }
+            = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        public IEnumerable<PackageCandidateItem> GetCandidates(AssemblyName assemblyName)
         {
             //skip if load System.IO.FileSystem
-            if (assemblyName.Name.StartsWith( typeof(File).GetTypeInfo().Assembly.GetName().Name))
-                return null;
+            if (assemblyName.Name.StartsWith(typeof(File).GetTypeInfo().Assembly.GetName().Name))
+                yield break;
 
-            var packagePath = Path.Combine(_storePath, assemblyName.Name);
+            if (!AssemblyToPackageMapping.TryGetValue(assemblyName.Name, out var packageName))
+                packageName = assemblyName.Name;
+            var packagePath = Path.Combine(_storePath, packageName);
             if (Directory.Exists(packagePath))
             {
                 var packageVersions = GetPackageVersions(packagePath).OrderBy(_ => _.Item1);
-                CandidateItem[] candidates = null;
                 
                 //if no version info return max version
                 if (assemblyName.Version == null) 
                 {
                     var path = packageVersions.First().Item2;
                     var pDescriptor = FindPackage(assemblyName, path);
-                    candidates = new CandidateItem[] { new CandidateItem(pDescriptor, 0) };
+                    yield return new PackageCandidateItem(pDescriptor, 0);
                 }
                 else
                 {
@@ -58,34 +54,26 @@ namespace Genus.Modularity.NuGet
                     {
                         var path = eqPkgVersion.Item2;
                         var pDescriptor = FindPackage(assemblyName, path);
-                        candidates = new CandidateItem[] { new CandidateItem(pDescriptor, 0) };
+                        yield return new PackageCandidateItem(pDescriptor, 0) ;
                     }
                     else
                     {
                         var asmVersionWithoutRevision = new NuGetVersion(asmVersion.Major, asmVersion.Minor, asmVersion.Patch);
                         //find all packages
-                        candidates = (from pv in packageVersions
-                                      let path = pv.Item2
-                                      where CompareVersion(pv.Item1, asmVersionWithoutRevision) >=0
-                                      let pDescriptor = FindPackage(assemblyName, path)
-                                      let priority = CompareVersion(new NuGetVersion(pDescriptor.AssemblyVersion), asmVersion)
-                                      where priority >=0
-                                      select new CandidateItem(
-                                          pDescriptor,
-                                          priority
-                                          )
-                            ).ToArray();
+                        foreach (var pv in packageVersions)
+                        {
+                            var path = pv.Item2;
+                            if (CompareVersion(pv.Item1, asmVersionWithoutRevision) >= 0)
+                            {
+                                var pDescriptor = FindPackage(assemblyName, path);
+                                var priority = CompareVersion(new NuGetVersion(pDescriptor.AssemblyVersion), asmVersion);
+                                if (priority >= 0)
+                                    yield return new PackageCandidateItem( pDescriptor, priority);
+                            }
+                        }
                     }
                 }
-                if (candidates.Length > 0)
-                {
-                    var candidate = candidates.OrderBy(_ => _.Priority)
-                                              .ThenByDescending(_ => _.Package.AssemblyVersion)
-                                              .First();
-                    return candidate.Package;
-                }
             }
-            return null;
         }
 
         private PackageDescriptor FindPackage(AssemblyName assemblyName, string packagePath)
