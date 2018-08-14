@@ -55,23 +55,35 @@ namespace Genus.Modularity.NuGet
         }
 
         private static IEnumerable<IPackageStore> GetDefaultStores()
-        {
-            var profilePath = Environment.GetEnvironmentVariable("USERPROFILE");
-            var storePath = Path.Combine(profilePath, ".nuget", "packages");
-            yield return new FolderPackageStrore(storePath);
-#if NETSTANDARD2_0
-            var coreapp2store = GetDefaultNetCoreApp2Store();
-            if (coreapp2store != null)
-                yield return coreapp2store;
-        }
+            => GetProbeDirectories().Select(path => new FolderPackageStrore(path));
 
-        private static IPackageStore GetDefaultNetCoreApp2Store()
+        private static IEnumerable<string> GetProbeDirectories()
         {
-            var storePath = @"C:\Program Files\dotnet\store\x64\netcoreapp2.0";
-            if(Directory.Exists(storePath))
-                return new FolderPackageStrore( storePath);
-            return null;
+            //#if NETSTANDARD1_5||NETSTANDARD2_0
+            //            var storePath = @"C:\Program Files\dotnet\store\x64\netcoreapp2.0";
+            //            if(Directory.Exists(storePath))
+            //                return new FolderPackageStrore( storePath);
+            //            return null;
+            //#endif
+#if NETSTANDARD1_6||NETSTANDARD2_0
+            var probeDirectories = AppContext.GetData("PROBING_DIRECTORIES");
+#else
+            var probeDirectories = AppDomain.CurrentDomain.GetData("PROBING_DIRECTORIES");
 #endif
+            var listOfDirectories = probeDirectories as string;
+            if (!string.IsNullOrEmpty(listOfDirectories))
+            {
+                return listOfDirectories.Split(new char[] { Path.PathSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            string basePath = Environment.GetEnvironmentVariable("HOME");
+            if(string.IsNullOrEmpty(basePath)||!Directory.Exists(basePath))
+                basePath = Environment.GetEnvironmentVariable("USERPROFILE"); ;
+
+            if (string.IsNullOrEmpty(basePath))
+                return new string[0];
+
+            return new string[] { Path.Combine(basePath, ".nuget", "packages") };
         }
     }
 }
