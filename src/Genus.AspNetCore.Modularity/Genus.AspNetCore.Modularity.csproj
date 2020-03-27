@@ -13,9 +13,9 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <AssemblyVersion>1.0.0.25</AssemblyVersion>
-    <FileVersion>1.0.0.25</FileVersion>
-    <Version>1.0.0-alpha5-1801161</Version>
+    <AssemblyVersion>1.0.0.26</AssemblyVersion>
+    <FileVersion>1.0.0.26</FileVersion>
+    <Version>1.0.0-alpha5-1808291</Version>
     <PackageLicenseUrl>https://github.com/genusP/Genus.Modularity/blob/master/LICENSE</PackageLicenseUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>

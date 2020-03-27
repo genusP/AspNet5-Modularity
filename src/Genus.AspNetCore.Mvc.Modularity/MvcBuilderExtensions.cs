@@ -33,8 +33,11 @@ namespace Genus.Extensions.DependencyInjection
             {
                 foreach (var pluginInfo in pluginManager.LoadedPlugins)
                 {
-                    options.FileProviders.Add(new PluginFileProvider(pluginInfo, "Views", "Views"));
-                    options.AdditionalCompilationReferences.Add(Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(pluginInfo.Assembly.Location));
+                    if (pluginInfo.Plugin is IAspNetCorePlugin plugin)
+                    {
+                        options.FileProviders.Add(new PluginFileProvider(pluginInfo, "Views", $"/Views/{plugin.UrlPrefix}"));
+                        options.AdditionalCompilationReferences.Add(Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(pluginInfo.Assembly.Location));
+                    }
                 }
             }
             return options;

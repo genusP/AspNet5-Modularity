@@ -10,7 +10,7 @@ namespace Genus.AspNetCore.Modularity
     {
         private readonly IFileProvider _fileProvider;
         private readonly string _pathPrefix;
-        public PluginFileProvider(PluginDescriptor pluginDescriptor, string physSubFolder, string virtSubFolder)
+        public PluginFileProvider(PluginDescriptor pluginDescriptor, string physSubFolder, string virtPrefix)
         {
             string path = pluginDescriptor.PluginRoot;
             if (!string.IsNullOrEmpty(physSubFolder))
@@ -18,9 +18,7 @@ namespace Genus.AspNetCore.Modularity
             if (Directory.Exists(path) && pluginDescriptor.Plugin is IAspNetCorePlugin plugin)
             {
                 _fileProvider = new PhysicalFileProvider(path);
-                _pathPrefix = "/" + plugin.UrlPrefix + "/";
-                if (!string.IsNullOrWhiteSpace(virtSubFolder))
-                    _pathPrefix = "/" + virtSubFolder + _pathPrefix;
+                _pathPrefix = virtPrefix;
             }
         }
 
@@ -32,9 +30,10 @@ namespace Genus.AspNetCore.Modularity
 
         private TRet ExecuteIfValidPath<TRet>(string subpath, Func<string, TRet> action) where TRet: class
         {
-            if (_fileProvider!=null && subpath.StartsWith(_pathPrefix, StringComparison.OrdinalIgnoreCase))
+            var prefix = _pathPrefix ?? "";
+            if (subpath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
-                var relativePath = subpath.Substring(_pathPrefix.Length);
+                var relativePath = subpath.Substring(prefix.Length);
                 return action(relativePath);
             }
             return null;

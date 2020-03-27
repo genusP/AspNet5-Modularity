@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;net451;netstandard2.0</TargetFrameworks>
-    <Version>1.0.0-alpha4-1708161</Version>
+    <Version>1.0.0-alpha5-1808291</Version>
     <Authors>Pundikov Gennady</Authors>
     <Company />
     <Description />
@@ -10,6 +10,8 @@
     <PackageLicenseUrl>https://github.com/genusP/Genus.Modularity/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/genusP/Genus.Modularity</PackageProjectUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <AssemblyVersion>1.0.0.26</AssemblyVersion>
+    <FileVersion>1.0.0.26</FileVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
